@@ -38,4 +38,48 @@ public class test {
         }
 
     }
+
+    @Test
+    //演示使用PS执行DML
+    public void test2(){
+        //定义变量用来模拟前段传入的数据
+        int no=1; String name="张三丰";
+
+        Connection conn=null;
+        try {
+            conn=DBUtil.getConnection();
+           //创建PS的同时也需要把SQL语句传入
+            String sql="UPDATE emps set ename=? where empno=?";
+            PreparedStatement smt=conn.prepareStatement(sql);
+            //依次设置？所对应的数值
+            smt.setString(1,name);
+            smt.setInt(2,no);
+            smt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            DBUtil.closeConnection(conn);
+        }
+
+    }
+
+    @Test
+    //演示PS执行查询
+    public void test3(){
+        double sal=6000.0;
+
+        Connection conn=null;
+        try {
+            conn=DBUtil.getConnection();
+            String sql="select * from emps where sal>?";
+            PreparedStatement smt=conn.prepareStatement(sql);
+            smt.setDouble(1,sal);
+            ResultSet res=smt.executeQuery();
+            while(res.next()){
+                System.out.println(res.getString("ename"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
