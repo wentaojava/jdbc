@@ -82,4 +82,31 @@ public class test {
             e.printStackTrace();
         }
     }
+
+    @Test
+    //演示PS防注入攻击
+    public void test4(){
+        //假设注入攻击
+        String name="tarena";
+        String pwd="a' or 'b";
+
+        Connection conn=null;
+        try {
+            conn=DBUtil.getConnection();
+            String sql="select * from users where username=? and password=?";
+            PreparedStatement smt=conn.prepareStatement(sql);
+            smt.setString(1,name);
+            smt.setString(2,pwd);
+            ResultSet res=smt.executeQuery();
+            if(res.next()){
+                System.out.println("查询成功");
+            }else{
+                System.out.println("查询失败");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            DBUtil.closeConnection(conn);
+        }
+    }
 }
