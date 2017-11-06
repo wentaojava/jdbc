@@ -59,4 +59,16 @@ public class DBUtil {
             }
         }
     }
+
+    //回滚事务
+    public static void rollBack(Connection conn){
+        if(conn!=null){
+            try {
+                conn.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException("回滚事务失败！",e);
+            }
+        }
+    }
 }

@@ -109,4 +109,91 @@ public class test {
             DBUtil.closeConnection(conn);
         }
     }
+
+    @Test
+    //演示元数据
+    public void test5(){
+        Connection conn=null;
+        try {
+            conn=DBUtil.getConnection();
+            String sql="SELECT * FROM EMPS ORDER BY EMPNO";
+            Statement smt=conn.createStatement();
+            ResultSet res=smt.executeQuery(sql);
+            //创建元数据,返回结果集的概述信息
+            ResultSetMetaData rsmd=res.getMetaData();
+            System.out.println(rsmd.getColumnCount());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            DBUtil.closeConnection(conn);
+        }
+    }
+
+    @Test
+    //演示简单转账流程
+    public void test6(){
+        //假设用户登录的账号
+        String user="00001";
+        //假设收款账号
+        String accept="00002";
+        //假设转账1000
+        double money=1000.0;
+
+        Connection conn=null;
+        try {
+            conn=DBUtil.getConnection();
+
+            //取消自动提交事务
+           conn.setAutoCommit(false);
+
+            //查询账号余额
+            String sql="select money from accounts where id=?";
+            PreparedStatement smt=conn.prepareStatement(sql);
+            smt.setString(1,user);
+            ResultSet res=smt.executeQuery();
+            res.next();
+            double paymoney=res.getDouble("money");
+            if(paymoney>=money){
+                //查询收款账号是否存在
+                String sql2="select * from accounts where id=?";
+                PreparedStatement smt2=conn.prepareStatement(sql2);
+                smt2.setString(1,accept);
+                ResultSet res2=smt2.executeQuery();
+                double acceptMoney=0;//声明收款方余额
+                if(!res2.next()){
+                    System.out.println("收款账号不存在");
+                    return;
+                }else{
+                    acceptMoney= res2.getDouble("money");
+                }
+                //开始转账
+                String sql3="update accounts set money=? where id=?";
+                PreparedStatement smt3=conn.prepareStatement(sql3);
+                smt3.setDouble(1,paymoney-money);
+                smt3.setString(2,user);
+                smt3.executeUpdate();
+
+                Integer.valueOf("断电了");
+
+                String sql4="update accounts set money=? where id=?";
+                PreparedStatement smt4=conn.prepareStatement(sql4);
+                smt4.setDouble(1,acceptMoney+money);
+                smt4.setString(2,accept);
+                smt4.executeUpdate();
+            }else {
+                System.out.println("余额不足");
+                return;
+            }
+
+            //手动提交事务
+            conn.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            //发生异常时回滚事务
+            DBUtil.rollBack(conn);
+        }finally {
+            DBUtil.closeConnection(conn);
+        }
+    }
 }
