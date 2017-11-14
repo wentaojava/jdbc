@@ -113,4 +113,42 @@ public class day3Test {
             DBUtil.closeConnection(conn);
         }
     }
+    
+    @Test
+    /**方法描述
+     * 演示分页查询
+     * @author wentao
+     * @param
+     * @return
+     */
+    public void test3(){
+        //假设每页显示10行
+        int size=10;
+        //假设显示第三页数据
+        int page=3;
+
+        Connection conn=null;
+        try {
+            conn=DBUtil.getConnection();
+            //mysql分页查询语句
+            //查询第11到第15条数据
+            //select * from table_name limit 10,5
+            String sql="SELECT * FROM EMPS ORDER BY EMPNO ASC LIMIT ?,?";
+            PreparedStatement smt=conn.prepareStatement(sql);
+            //起始行
+            smt.setInt(1,(page-1)*size);
+            smt.setInt(2,size);
+            ResultSet rs=smt.executeQuery();
+            while(rs.next()){
+                System.out.println(rs.getInt("empno"));
+                System.out.println(rs.getString("ename"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            DBUtil.closeConnection(conn);
+        }
+
+    }
 }
