@@ -1,6 +1,8 @@
 package day3;
 
+import DAO.EmpsDao;
 import Util.DBUtil;
+import entity.Emps;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
@@ -54,7 +56,7 @@ public class day3Test {
     }
 
     @Test
-    /**方法描述
+    /**方法描述 包含事务
      * 先增加一个部门，再给这个部门增加一个员工
      * 演示如何获得自增主键
      * @author wentao
@@ -137,6 +139,7 @@ public class day3Test {
             PreparedStatement smt=conn.prepareStatement(sql);
             //起始行
             smt.setInt(1,(page-1)*size);
+            //结束行
             smt.setInt(2,size);
             ResultSet rs=smt.executeQuery();
             while(rs.next()){
@@ -151,4 +154,23 @@ public class day3Test {
         }
 
     }
+
+    /**方法描述
+     * 测试EmpsDao
+     * @author wentao
+     * @param
+     * @return
+     */
+    @Test
+    public void test4(){
+        EmpsDao dao=new EmpsDao();
+        Emps e=dao.findById(118);
+        if(e!=null){
+            System.out.println(e.getEname());
+            e.setEname("开发");
+            dao.update(e);
+        }
+
+    }
+
 }
