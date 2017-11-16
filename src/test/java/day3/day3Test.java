@@ -167,8 +167,9 @@ public class day3Test {
         Emps e=dao.findById(118);
         if(e!=null){
             System.out.println(e.getEname());
-            e.setEname("开发");
+            e.setEname("开发123");
             dao.update(e);
+            dao.closeDaoConn();
         }
 
     }

@@ -18,6 +18,7 @@ import java.util.List;
  * @copyright Wuxi ,Ltd.copyright 2015-2025
  */
 public class EmpsDao implements Serializable{
+    Connection conn=null;
 
     /**方法描述
      * 增加一个员工
@@ -26,7 +27,28 @@ public class EmpsDao implements Serializable{
      * @return
      */
     public void save(Emps emps){
-        
+        try {
+            conn=DBUtil.getConnection();
+            conn.setAutoCommit(false);
+            String sql="INSERT INTO EMPS (ENAME,JOB,MGR,HIREDATE,SAL,COMM,DEPTNO) VALUES" +
+                    " (?,?,?,?,?,?,?)";
+            PreparedStatement smt=conn.prepareStatement(sql);
+            smt.setString(1,emps.getEname());
+            smt.setString(2,emps.getJob());
+            smt.setInt(3,emps.getMgr());
+            smt.setDate(4,emps.getHiredate());
+            smt.setFloat(5,emps.getSal());
+            smt.setFloat(6,emps.getComm());
+            smt.setInt(7,emps.getDeptno());
+            smt.executeUpdate();
+            System.out.println("新增成功");
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DBUtil.rollBack(conn);
+            throw new RuntimeException("新增单个员工失败！",e);
+        }
+
     }
 
     /**方法描述
@@ -36,9 +58,9 @@ public class EmpsDao implements Serializable{
      * @return
      */
     public void update(Emps emp){
-        Connection conn=null;
         try {
             conn= DBUtil.getConnection();
+            conn.setAutoCommit(false);
             String sql="update emps set ename=?,job=?,mgr=?,hiredate=?,sal=?,comm=?,deptno=? " +
                         "where empno=?";
             PreparedStatement smt=conn.prepareStatement(sql);
@@ -51,11 +73,11 @@ public class EmpsDao implements Serializable{
             smt.setInt(7,emp.getDeptno());
             smt.setInt(8,emp.getEmpno());
             smt.executeUpdate();
+            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            DBUtil.rollBack(conn);
             throw new RuntimeException("修改员工信息失败！",e);
-        }finally {
-            DBUtil.closeConnection(conn);
         }
 
     }
@@ -67,6 +89,20 @@ public class EmpsDao implements Serializable{
      * @return
      */
     public void delete(int id){
+        try {
+            conn=DBUtil.getConnection();
+            conn.setAutoCommit(false);
+            String sql="delete from emps where empno=?";
+            PreparedStatement smt=conn.prepareStatement(sql);
+            smt.setInt(1,id);
+            smt.executeUpdate();
+            System.out.println("删除一个员工成功");
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DBUtil.rollBack(conn);
+            throw new RuntimeException("删除失败",e);
+        }
 
 
     }
@@ -78,13 +114,15 @@ public class EmpsDao implements Serializable{
      * @return
      */
     public Emps findById(int id){
-        Connection conn=null;
+       // Connection conn=null;
         try {
             conn=DBUtil.getConnection();
+            conn.setAutoCommit(false);
             String sql="select * from emps where empno=?";
             PreparedStatement smt=conn.prepareStatement(sql);
             smt.setInt(1,id);
             ResultSet rs=smt.executeQuery();
+            conn.commit();
             if(rs.next()){
                 Emps emp=new Emps();
                 emp.setEmpno(rs.getInt("empno"));
@@ -96,14 +134,17 @@ public class EmpsDao implements Serializable{
                 emp.setComm(rs.getFloat("comm"));
                 emp.setDeptno(rs.getInt("deptno"));
                 return emp;
+
+            }else{
+                return null;
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
+            DBUtil.rollBack(conn);
             throw new RuntimeException("查询失败！",e);
-        }finally {
-            DBUtil.closeConnection(conn);
         }
-        return null;
+
 
     }
 
@@ -117,4 +158,15 @@ public class EmpsDao implements Serializable{
 return null;
     }
 
+    /**方法描述
+     * 归还连接池
+     * @author wentao
+     * @param
+     * @return
+     */
+    public void closeDaoConn(){
+        DBUtil.closeConnection(conn);
+    }
+
 }
+

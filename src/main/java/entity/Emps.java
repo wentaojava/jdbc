@@ -35,7 +35,7 @@ public class Emps implements Serializable{
     }
 
     public void setEname(String ename) {
-        this.ename = ename;
+       this.ename = ename;
     }
 
     public String getJob() {
