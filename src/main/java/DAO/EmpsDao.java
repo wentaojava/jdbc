@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -155,7 +156,37 @@ public class EmpsDao implements Serializable{
      * @return
      */
     public List<Emps> findByDept(int deptno){
-return null;
+        List<Emps> emps= new LinkedList<Emps>();
+        Emps emp=new Emps();
+        try {
+            conn=DBUtil.getConnection();
+            conn.setAutoCommit(false);
+            String sql="select * from emps where deptno=?";
+            PreparedStatement smt=conn.prepareStatement(sql);
+            smt.setInt(1,deptno);
+            ResultSet rs=smt.executeQuery();
+            if(rs.next()){
+            while(rs.next()){
+                emp.setEmpno(rs.getInt("empno"));
+                emp.setEname(rs.getString("ename"));
+                emp.setJob(rs.getString("job"));
+                emp.setMgr(rs.getInt("mgr"));
+                emp.setHiredate(rs.getDate("hiredate"));
+                emp.setSal(rs.getFloat("sal"));
+                emp.setComm(rs.getFloat("commm"));
+                emp.setDeptno(rs.getInt("deptno"));
+                emps.add(emp);
+            }
+                conn.commit();
+                return emps;
+            }else{
+                return null;}
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DBUtil.rollBack(conn);
+            throw new RuntimeException("根据部门id查询失败",e);
+        }
+
     }
 
     /**方法描述
