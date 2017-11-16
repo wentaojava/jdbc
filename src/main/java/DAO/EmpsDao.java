@@ -157,7 +157,7 @@ public class EmpsDao implements Serializable{
      */
     public List<Emps> findByDept(int deptno){
         List<Emps> emps= new LinkedList<Emps>();
-        Emps emp=new Emps();
+
         try {
             conn=DBUtil.getConnection();
             conn.setAutoCommit(false);
@@ -165,22 +165,20 @@ public class EmpsDao implements Serializable{
             PreparedStatement smt=conn.prepareStatement(sql);
             smt.setInt(1,deptno);
             ResultSet rs=smt.executeQuery();
-            if(rs.next()){
             while(rs.next()){
+                Emps emp=new Emps();
                 emp.setEmpno(rs.getInt("empno"));
                 emp.setEname(rs.getString("ename"));
                 emp.setJob(rs.getString("job"));
                 emp.setMgr(rs.getInt("mgr"));
                 emp.setHiredate(rs.getDate("hiredate"));
                 emp.setSal(rs.getFloat("sal"));
-                emp.setComm(rs.getFloat("commm"));
+                emp.setComm(rs.getFloat("comm"));
                 emp.setDeptno(rs.getInt("deptno"));
                 emps.add(emp);
             }
-                conn.commit();
-                return emps;
-            }else{
-                return null;}
+            conn.commit();
+            return emps;
         } catch (SQLException e) {
             e.printStackTrace();
             DBUtil.rollBack(conn);

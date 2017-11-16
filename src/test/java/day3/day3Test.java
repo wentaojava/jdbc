@@ -6,6 +6,8 @@ import entity.Emps;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * 类的描述：
@@ -164,11 +166,13 @@ public class day3Test {
     @Test
     public void test4(){
         EmpsDao dao=new EmpsDao();
-        Emps e=dao.findById(118);
-        if(e!=null){
-            System.out.println(e.getEname());
-            e.setEname("开发123");
-            dao.update(e);
+
+        List<Emps> emps=dao.findByDept(1);
+        if(emps!=null){
+            //Iterator<Emps> list=emps.iterator();
+            for(int i=0;i<emps.size();i++){
+                System.out.println(emps.get(i).getEname());
+            }
             dao.closeDaoConn();
         }
 
